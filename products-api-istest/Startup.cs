@@ -29,7 +29,7 @@ namespace products_api_istest
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            var connection = @"Server = istest-aw-vm-sql.eastus.cloudapp.azure.com; initial catalog = AdventureWorks2016; User Id = igordpmi5; Password = BujhmC725011; MultipleActiveResultSets = True; ";
+            var connection = @"Server = istest-aw-vm-sql.eastus.cloudapp.azure.com; initial catalog = AdventureWorks2016; User Id = ***; Password = ***; MultipleActiveResultSets = True; ";
             //var connection = @"Server=.\SQLEXPRESS;initial catalog=AdventureWorks2012;Integrated Security=True;MultipleActiveResultSets=True;";
             
             services.AddDbContext<AdventureWorks2016Context>(options => options.UseSqlServer(connection));
