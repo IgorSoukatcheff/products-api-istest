@@ -5,12 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Xml;
-using log4net;
-using log4net.Config;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NLog.Common;
+using NLog.Web;
 
 namespace products_api_istest
 {
@@ -18,15 +18,25 @@ namespace products_api_istest
     {
         public static void Main(string[] args)
         {
-            //var logRepository = LogManager.GetRepository(Assembly.GetEntryAssembly());
-            //XmlConfigurator.Configure(logRepository, new FileInfo("log4net.config"));
-            XmlDocument log4netConfig = new XmlDocument();
-            log4netConfig.Load(File.OpenRead("log4net.config"));
-            var repo = log4net.LogManager.CreateRepository(Assembly.GetEntryAssembly(),
-                       typeof(log4net.Repository.Hierarchy.Hierarchy));
-            log4net.Config.XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
-
-            BuildWebHost(args).Run();
+           
+            var logger = NLog.Web.NLogBuilder.ConfigureNLog("azurenlog.config").GetCurrentClassLogger();
+            try
+            {
+                InternalLogger.LogFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "logs", "nlog-internals.txt");
+                logger.Debug("init main");
+                BuildWebHost(args).Run();
+            }
+            catch (Exception exception)
+            {
+                //NLog: catch setup errors
+                logger.Error(exception, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                // Ensure to flush and stop internal timers/threads before application-exit (Avoid segmentation fault on Linux)
+                NLog.LogManager.Shutdown();
+            }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
@@ -41,10 +51,10 @@ namespace products_api_istest
                     logging.ClearProviders();
                     logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                 })
-                //.UseNLog()
+                .UseNLog()
                 .UseContentRoot(InExecutionDirectory())
                 .UseKestrel()
-                .UseIISIntegration()
+                .UseIISIntegration()                              
                 .Build();
 
         public static string InExecutionDirectory(string filename = "") => Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), filename);

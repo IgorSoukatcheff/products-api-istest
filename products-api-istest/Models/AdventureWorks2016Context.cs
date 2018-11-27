@@ -14,7 +14,9 @@ namespace products_api_istest.Models
             : base(options)
         {
         }
+        #region DbSets
 
+        
         public virtual DbSet<Address> Address { get; set; }
         public virtual DbSet<AddressType> AddressType { get; set; }
         public virtual DbSet<AwbuildVersion> AwbuildVersion { get; set; }
@@ -87,14 +89,14 @@ namespace products_api_istest.Models
 
         // Unable to generate entity type for table 'Production.ProductDocument'. Please see the warning messages.
         // Unable to generate entity type for table 'Production.Document'. Please see the warning messages.
-
+        #endregion
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
                 //#warning To protect potentially sensitive information in your connection string, you should move it out of source code. See http://go.microsoft.com/fwlink/?LinkId=723263 for guidance on storing connection strings.
-                //optionsBuilder.UseSqlServer("Server=istest-aw-vm-sql.eastus.cloudapp.azure.com;initial catalog=AdventureWorks2016;User Id=***;Password=***;MultipleActiveResultSets=True;");
-                optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;initial catalog=AdventureWorks2012;Integrated Security=True;MultipleActiveResultSets=True;");
+                //optionsBuilder.UseSqlServer("Server=istest-aw-vm-sql.eastus.cloudapp.azure.com;initial catalog=AdventureWorks2016;User Id=igordpmi5;Password=BujhmC725011;MultipleActiveResultSets=True;");
+               // optionsBuilder.UseSqlServer(@"Server=.\SQLEXPRESS;initial catalog=AdventureWorks2012;Integrated Security=True;MultipleActiveResultSets=True;");
             }
         }
 

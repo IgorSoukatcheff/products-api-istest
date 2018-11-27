@@ -29,11 +29,11 @@ namespace products_api_istest
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            var connection = @"Server = istest-aw-vm-sql.eastus.cloudapp.azure.com; initial catalog = AdventureWorks2016; User Id = ***; Password = ***; MultipleActiveResultSets = True; ";
-            //var connection = @"Server=.\SQLEXPRESS;initial catalog=AdventureWorks2012;Integrated Security=True;MultipleActiveResultSets=True;";
             
-            services.AddDbContext<AdventureWorks2016Context>(options => options.UseSqlServer(connection));
-            services.AddSwaggerGen(c =>
+            services.AddDbContext<AdventureWorks2016Context>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("AdventureWorksDatabase")));
+        
+        services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "Product API IS Test", Version = "v1" });
             });

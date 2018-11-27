@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using products_api_istest.Models;
 
 namespace products_api_istest.Controllers
@@ -14,26 +15,28 @@ namespace products_api_istest.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly AdventureWorks2016Context _context;
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(ProductsController));
-        public ProductsController(AdventureWorks2016Context context)
-        {
-            _context = context;
-            
+        // private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(ProductsController));
+        private readonly ILogger<ProductsController> _logger;
 
-    }
+        public ProductsController(AdventureWorks2016Context context, ILogger<ProductsController> logger)
+        {
+            _logger = logger;
+            _context = context;
+            _logger.LogDebug(1, "NLog injected into Controller");
+        }
 
     // GET: api/Products
     [HttpGet]
         public IEnumerable<Product> GetProduct()
         {
-            log.Info("Hello logging world!");
+            _logger.LogDebug("Hello logging world!");
             try
             {
-                return _context.Product;
+                return _context.Product.ToArray();
             }
             catch(Exception ex)
             {
-                log.Error(ex.ToString());
+                _logger.LogError(ex.ToString());
                 throw;
             }
 
@@ -47,15 +50,48 @@ namespace products_api_istest.Controllers
             {
                 return BadRequest(ModelState);
             }
-
-            var product = await _context.Product.FindAsync(id);
-
-            if (product == null)
+            try
             {
-                return NotFound();
-            }
+                var product = await _context.Product.FindAsync(id);
 
-            return Ok(product);
+                if (product == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(product);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw;
+            }
+        }
+
+        // GET: api/Products/name/testprod
+        [HttpGet("name/{prodName}")]
+        public IActionResult GetProductByName([FromRoute] string prodName)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            try
+            {
+                var products =  _context.Product.Where(x => x.Name.Contains(prodName)).Select(x =>x);
+
+                if (products == null)
+                {
+                    return NotFound();
+                }
+
+                return Ok(products);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex.ToString());
+                throw;
+            }
         }
 
         // PUT: api/Products/5
@@ -80,7 +116,7 @@ namespace products_api_istest.Controllers
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                log.Error(ex.ToString());
+                _logger.LogError(ex.ToString());
                 if (!ProductExists(id))
                 {
                     return NotFound();
