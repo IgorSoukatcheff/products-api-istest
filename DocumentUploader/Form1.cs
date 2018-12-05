@@ -68,6 +68,7 @@ namespace DocumentUploader
                 }               
 
                 dto.DocumentContent = Encoding.UTF8.GetBytes(Convert.ToBase64String(File.ReadAllBytes(_filepath)));
+                dto.DocumentContentLenght = dto.DocumentContent.Length;
                 dto.DocumentName = label1.Text;
                 dto.FileName = label1.Text;
                 dto.DocumentMetadata = JsonConvert.SerializeObject(attribList);

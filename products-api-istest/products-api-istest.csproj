@@ -31,6 +31,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AdwentureLogs2016Data.Shared\AdwentureLogs2016Data.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="C:\Users\igordpmi5\.nuget\packages\nlog.config\4.5.11\contentFiles\any\any\NLog.config">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </None>

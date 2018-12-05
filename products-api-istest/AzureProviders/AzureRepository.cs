@@ -1,7 +1,8 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using AdwentureLogs2016Data.Shared.Models.Dtos;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
-using products_api_istest.Models.Dtos;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

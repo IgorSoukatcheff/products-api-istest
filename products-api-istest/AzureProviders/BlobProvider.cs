@@ -1,5 +1,6 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using products_api_istest.Models.Dtos;
+﻿using AdwentureLogs2016Data.Shared.Models.Dtos;
+using Microsoft.WindowsAzure.Storage;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;

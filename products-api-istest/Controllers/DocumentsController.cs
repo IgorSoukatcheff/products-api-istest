@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AdwentureLogs2016Data.Shared.Models.Dtos;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using products_api_istest.AzureProviders;
-using products_api_istest.Models.Dtos;
+
 
 namespace products_api_istest.Controllers
 {

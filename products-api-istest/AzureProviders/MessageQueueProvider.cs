@@ -1,7 +1,7 @@
-﻿using Microsoft.WindowsAzure.Storage;
+﻿using AdwentureLogs2016Data.Shared.Models.Dtos;
+using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
-using products_api_istest.Models.Dtos;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +33,7 @@ namespace products_api_istest.AzureProviders
             {
                 queue.Metadata.Add("metadataKey", "metadataValue");
                 await queue.SetMetadataAsync();
-            }
+            }            
             doc.DocumentContent = new byte[]{ };
             var data = JsonConvert.SerializeObject(doc);
             var msg = new CloudQueueMessage(data);
