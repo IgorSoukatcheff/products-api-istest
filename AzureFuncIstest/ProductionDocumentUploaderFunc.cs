@@ -2,6 +2,7 @@ using System;
 using AdwentureLogs2016Data.Shared.Models;
 using AdwentureLogs2016Data.Shared.Models.Dtos;
 using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Host.Bindings.Runtime;
 using Microsoft.Azure.WebJobs.Host;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,10 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Newtonsoft.Json;
+using System.IO;
+using Microsoft.WindowsAzure.Storage.Blob;
+using System.Threading.Tasks;
+using System.Linq;
 
 namespace AzureFuncIstest
 {
@@ -16,9 +21,10 @@ namespace AzureFuncIstest
     public static class ProductionDocumentUploaderFunc
     {
         [FunctionName("ProductionDocumentUploaderFunc")]
-        public static void Run(
+        public static async Task Run(
             [QueueTrigger("filemetadataproductionistest", Connection = "QueueStorage")]
-            CloudQueueMessage myQueueItem, 
+            CloudQueueMessage myQueueItem,
+            Binder binder,
             ILogger log)
         {
             //log.LogInformation($"C# Queue trigger function processed: {myQueueItem}");
@@ -26,18 +32,18 @@ namespace AzureFuncIstest
             
             var blobName = dto.AzureFileName;
             //todo get blob from storage (by guid from the queue)
-            //var attributes = new Attribute[]
-            //{
-            //   new BlobAttribute("docstoragecontaineristest/"+blobName),
-            //   new StorageAccountAttribute("AzureWebJobsStorage")
-            //};
-            //using (var writer = await binder.BindAsync<TextWriter>(attributes))
-            //{
-            //    writer.Write("Hello World!");
-            //}
-            dto.DocumentContent = new byte[] { };
+            var attributes = new Attribute[]
+            {
+               new BlobAttribute("docstoragecontaineristest/"+blobName),
+               new StorageAccountAttribute("AzureWebJobsStorage")
+            };
+            CloudBlockBlob blob = await binder.BindAsync<CloudBlockBlob>(attributes);
+            dto.DocumentContent = new byte[dto.DocumentContentLenght];
+            var result = blob.DownloadToByteArrayAsync(dto.DocumentContent, 0).Result;
 
-            var conetnt = ReadBlob("docstoragecontaineristest", blobName, dto.DocumentContentLenght);
+            
+
+            //dto.DocumentContent = ReadBlob("docstoragecontaineristest", blobName, dto.DocumentContentLenght);
 
             var connectionString = Environment.GetEnvironmentVariable("AdventureWorksDatabase");
             var optionsBuilder = new DbContextOptionsBuilder<AdventureWorks2016Context>();
@@ -45,6 +51,26 @@ namespace AzureFuncIstest
             using (var context = new AdventureWorks2016Context(optionsBuilder.Options))
             {
                 // add doc to the db
+                //var owner = context.Employee.Where(x => x.BusinessEntityId == 1).FirstOrDefault();
+                var docId = context.GetNextDocId();
+                context.Document.Add(new Document()
+                {
+                    ChangeNumber = 1,
+                    DocumentContent = dto.DocumentContent,
+                    DocumentNode = docId,
+                    DocumentSummary = dto.DocumentMetadata,
+                    FileExtension = Path.GetExtension(dto.FileName),
+                    FileName = dto.FileName,
+                    FolderFlag = false,
+                    ModifiedDate = DateTime.Now,
+                    Owner = 1,
+                    Revision = "",
+                    Rowguid = Guid.NewGuid(),
+                    Status = 1,
+                    Title = dto.DocumentName
+
+                });
+                context.SaveChanges();
             }
         }
 

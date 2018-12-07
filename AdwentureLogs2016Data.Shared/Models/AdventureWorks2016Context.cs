@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.SqlServer.Types;
 
 namespace AdwentureLogs2016Data.Shared.Models
 {
@@ -86,6 +88,7 @@ namespace AdwentureLogs2016Data.Shared.Models
         public virtual DbSet<Vendor> Vendor { get; set; }
         public virtual DbSet<WorkOrder> WorkOrder { get; set; }
         public virtual DbSet<WorkOrderRouting> WorkOrderRouting { get; set; }
+        public virtual DbSet<Document> Document { get; set; }
 
         // Unable to generate entity type for table 'Production.ProductDocument'. Please see the warning messages.
         // Unable to generate entity type for table 'Production.Document'. Please see the warning messages.
@@ -2594,6 +2597,37 @@ namespace AdwentureLogs2016Data.Shared.Models
                     .HasForeignKey(d => d.WorkOrderId)
                     .OnDelete(DeleteBehavior.ClientSetNull);
             });
+
+            modelBuilder.Entity<Document>(entity =>
+            {
+                entity.HasKey(e => e.DocumentNode);
+                entity.ToTable("Document", "Production");
+
+             
+                entity.Property(e => e.Owner).HasColumnName("BusinessEntityID");
+
+                entity.Property(e => e.ModifiedDate)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("(getdate())");
+
+                entity.Property(e => e.Owner).HasColumnName("Owner");
+
+                entity.Property(e => e.Rowguid)
+                    .HasColumnName("rowguid")
+                    .HasDefaultValueSql("(newid())");
+
+                entity.HasOne(d => d.OwnerEmployee)
+                   .WithMany(p => p.Documents)
+                   .HasForeignKey(d => d.Owner)
+                   .OnDelete(DeleteBehavior.ClientSetNull);
+            });
+        }
+
+        public SqlHierarchyId GetNextDocId()
+        {
+            var root = SqlHierarchyId.GetRoot();
+            var maxChilds = Document.Select(x => x.DocumentNode.GetAncestor(1)).ToList();
+            return root.GetDescendant(maxChilds.Max(), SqlHierarchyId.Null);
         }
     }
 }

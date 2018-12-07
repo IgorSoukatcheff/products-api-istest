@@ -11,6 +11,7 @@ namespace AdwentureLogs2016Data.Shared.Models
             EmployeePayHistory = new HashSet<EmployeePayHistory>();
             JobCandidate = new HashSet<JobCandidate>();
             PurchaseOrderHeader = new HashSet<PurchaseOrderHeader>();
+            Documents = new HashSet<Document>();
         }
 
         public int BusinessEntityId { get; set; }
@@ -35,5 +36,6 @@ namespace AdwentureLogs2016Data.Shared.Models
         public ICollection<EmployeePayHistory> EmployeePayHistory { get; set; }
         public ICollection<JobCandidate> JobCandidate { get; set; }
         public ICollection<PurchaseOrderHeader> PurchaseOrderHeader { get; set; }
+        public ICollection<Document> Documents { get; set; }
     }
 }
