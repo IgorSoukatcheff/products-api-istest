@@ -53,7 +53,7 @@ namespace products_api_istest.Controllers
             }
             try
             {
-                var nextId = _context.GetNextDocId();
+                //var nextId = _context.GetNextDocId();
                 var product = await _context.Product.FindAsync(id);
 
                 if (product == null)

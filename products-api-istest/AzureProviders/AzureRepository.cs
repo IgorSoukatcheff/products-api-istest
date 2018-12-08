@@ -1,5 +1,6 @@
 ﻿using AdwentureLogs2016Data.Shared.Models.Dtos;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Auth;
 
@@ -15,7 +16,7 @@ namespace products_api_istest.AzureProviders
         private  CloudStorageAccount _account = null;
         private readonly MessageQueueProvider _message;
         private readonly BlobProvider _blob;
-        public AzureRepository(IHostingEnvironment hostingEnv)
+        public AzureRepository(IHostingEnvironment hostingEnv, IConfiguration _configuration)
         {
             if (hostingEnv.IsDevelopment())
             {
@@ -23,7 +24,9 @@ namespace products_api_istest.AzureProviders
             }
             else
             {
-                var creds = new StorageCredentials("adventureworksrgdiag331", "vEhDtYs7NQ+o/KXW1T9WOO9XMpXbl7jBMQiMBfQk043mP0BkGqjEqyRYpwzFgFYgWCDL1ZWwjkypCZeN6xYqqQ==");
+                var name = "adventureworksrgdiag331";
+                var key = _configuration[name];
+                var creds = new StorageCredentials(name,key);
                 _account = new CloudStorageAccount(creds, true);
             }
             _message = new MessageQueueProvider(_account);
